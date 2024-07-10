@@ -21,22 +21,6 @@ class SlackError(requests.exceptions.RequestException):
 
 
 class MettermostMessage(Message):
-    def __init__(self, client, response,
-                 message: str = None,
-                 blocks: List[BaseBlock] = None,
-                 attachments: List[Attachment] = None):
-        super().__init__()
-        self._client = client
-        self._response = response
-
-        self.message = message
-        self.attachments = attachments or []
-        self.blocks = blocks or []
-
-    @property
-    def response(self):
-        return self._response
-
     def send_to_thread(self, **kwargs):
         json = self._response.json()
         message_id = json['id']
@@ -157,15 +141,9 @@ class Mettermost(NotificationClient):
         response = self.call_resource(
             Resource('posts', 'POST'), json=data,
         )
-        return MettermostMessage(self, response, message=text, blocks=blocks, attachments=attachments)
-
-    def delete_message(self, message_id: str):
-        # url_path = f'/posts/{message_id}'
-        # resp = self.v4.delete(url_path)
-        response = self.call_resource(
-            Resource(f'posts/{message_id}', 'DELETE')
+        return MettermostMessage(
+            self, response, text=text, raise_exc=raise_exc,  blocks=blocks, attachments=attachments
         )
-        return response
 
     def upload_file(self, *args, **kwargs):
         pass

@@ -11,10 +11,10 @@ from notifications.mettermost.fields.blocks import (
 from notifications.mettermost.fields.attachments import (
     Attachment,
     AttachmentField,
-    ActionField,
-    ButtonField,
-    MenuField,
-    OptionField
+    AttachmentActionField,
+    AttachmentButtonField,
+    AttachmentMenuField,
+    AttachmentOptionField
 )
 
 
@@ -29,8 +29,8 @@ __all__ = [
     'TableBlock',
     'Attachment',
     'AttachmentField',
-    'ActionField',
-    'ButtonField',
-    'MenuField',
-    'OptionField'
+    'AttachmentActionField',
+    'AttachmentButtonField',
+    'AttachmentMenuField',
+    'AttachmentOptionField'
 ]

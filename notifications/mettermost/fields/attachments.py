@@ -28,11 +28,11 @@ class AttachmentField(ConvertibleObject):
         return data
 
 
-class ActionField:
+class AttachmentActionField:
     __type__ = None
 
     def __init__(self, name: str, action_id: str, integration_payload: dict = None, style: str = None,  **kwargs):
-        super(ActionField, self).__init__(**kwargs)
+        super(AttachmentActionField, self).__init__(**kwargs)
         self.action_id = action_id
         self.name = name
         self.integration = integration_payload
@@ -52,13 +52,13 @@ class ActionField:
         return data
 
 
-class ButtonField(ActionField):
+class AttachmentButtonField(AttachmentActionField):
     __type__ = 'button'
 
 
-class OptionField:
+class AttachmentOptionField:
     def __init__(self, text: str, value: str):
-        super(OptionField, self).__init__()
+        super(AttachmentOptionField, self).__init__()
         self.text = text
         self.value = value
 
@@ -67,19 +67,19 @@ class OptionField:
         return data
 
 
-class MenuField(ActionField):
+class AttachmentMenuField(AttachmentActionField):
     __type__ = 'select'
 
-    def __init__(self, *, options: List[OptionField] = None, data_source: str = None, **kwargs):
+    def __init__(self, *, options: List[AttachmentOptionField] = None, data_source: str = None, **kwargs):
         if not data_source and not options:
             raise ValueError('Options or data is required for menu fields')
 
-        super(MenuField, self).__init__(**kwargs)
+        super(AttachmentMenuField, self).__init__(**kwargs)
         self.options = options
         self.data_source = data_source
 
     def convert(self):
-        data = super(MenuField, self).convert()
+        data = super(AttachmentMenuField, self).convert()
 
         data['options'] = self.options
 
@@ -107,7 +107,7 @@ class Attachment(ConvertibleObject):
                  footer: str = None,
                  footer_icon: str = None,
                  fields: List[AttachmentField] = None,
-                 actions: List[ActionField] = None
+                 actions: List[AttachmentActionField] = None
                  ):
         super(Attachment, self).__init__()
         self.fallback = fallback
