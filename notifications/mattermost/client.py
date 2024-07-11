@@ -3,24 +3,43 @@ from typing import List
 import logging
 import requests
 
-from notifications.interfaces import Message, NotificationClient, Resource
-from notifications.mettermost.fields import BaseBlock, Attachment
+from notifications.common import NotificationClient, Resource
+from notifications.fields.blocks import BaseBlock
+from notifications.fields.attachments import Attachment
+from notifications.mattermost.converter import MattermostConverter
 
 ACCESS_TOKEN = None
 ACCESS_TOKEN_ENV_NAME = 'SLACK_ACCESS_TOKEN'
 BASE_URL = None
-BASE_URL_ENV_NAME = 'METTERMOST_URL'
+BASE_URL_ENV_NAME = 'MATTERMOST_URL'
 TEAM_ID = None
 TEAM_ID_ENV_NAME = 'SLACK_ACCESS_TOKEN'
 
 logger = logging.getLogger(__name__)
 
 
-class SlackError(requests.exceptions.RequestException):
+class MattermostError(requests.exceptions.RequestException):
     pass
 
 
-class MettermostMessage(Message):
+class MattermostMessage:
+    def __init__(self, client, response,
+                 text: str = None,
+                 raise_exc=False,
+                 attachments: List = None,
+                 blocks: List = None):
+        self._client = client
+        self._response = response
+        self._raise_exc = raise_exc
+
+        self.text = text
+        self.attachments = attachments or []
+        self.blocks = blocks or []
+
+    @property
+    def response(self):
+        return self._response
+
     def send_to_thread(self, **kwargs):
         json = self._response.json()
         message_id = json['id']
@@ -84,10 +103,10 @@ class MettermostMessage(Message):
         )
 
 
-class Mettermost(NotificationClient):
+class Mattermost(NotificationClient):
 
-    def __init__(self, base_url, *, token, team_id, **kwargs):
-        super(Mettermost, self).__init__(base_url, token=token, **kwargs)
+    def __init__(self, base_url, *, token, team_id=None):
+        super(Mattermost, self).__init__(base_url, token=token)
         self._team_id = team_id
 
     def channel_id_by_name(self, channel_name):
@@ -98,6 +117,14 @@ class Mettermost(NotificationClient):
 
         return response.json()['id']
 
+    def set_team_id_by_name(self, team_name):
+        response = self.call_resource(Resource('teams', 'GET'))
+        json = response.json()
+        for item in json:
+            if item['name'] == team_name:
+                self._team_id = item['id']
+                break
+
     @classmethod
     def from_env(cls):
         token = ACCESS_TOKEN or os.getenv(ACCESS_TOKEN_ENV_NAME)
@@ -105,6 +132,16 @@ class Mettermost(NotificationClient):
         team_id = TEAM_ID or os.getenv(TEAM_ID_ENV_NAME)
 
         return cls(base_url, token=token, team_id=team_id)
+
+    def _convert(self, blocks: List[BaseBlock]):
+        converter = MattermostConverter()
+        for block in blocks:
+            if not isinstance(block, BaseBlock):
+                converter.result += f'\n{block}\n'
+                continue
+
+            block.accept(converter)
+        return converter.result
 
     def send_notification(self,
                           channel: str, *,
@@ -124,13 +161,13 @@ class Mettermost(NotificationClient):
             'metadata': {}
         }
         if blocks:
-            data['message'] += ''.join(map(str, blocks))
+            data['message'] += self._convert(blocks)
 
         if root_id:
             data['root_id'] = root_id
 
         if attachments:
-            data['props']['attachments'] = [a.convert() for a in attachments]
+            data['props']['attachments'] = [a.to_dict() for a in attachments]
 
         if file_ids:
             data['file_ids'] = file_ids
@@ -141,7 +178,7 @@ class Mettermost(NotificationClient):
         response = self.call_resource(
             Resource('posts', 'POST'), json=data,
         )
-        return MettermostMessage(
+        return MattermostMessage(
             self, response, text=text, raise_exc=raise_exc,  blocks=blocks, attachments=attachments
         )
 

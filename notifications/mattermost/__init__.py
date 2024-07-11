@@ -1,11 +1,6 @@
-from notifications.mettermost.client import Mettermost, MettermostMessage as Message
-from notifications.mettermost.fields import (
+from notifications.mattermost.client import Mattermost, MattermostMessage as Message
+from notifications.mattermost.fields import (
     mrkdwn,
-    BaseBlock,
-    HeaderBlock,
-    SimpleTextBlockField,
-    SimpleTextBlock,
-    DividerBlock,
     Attachment,
     AttachmentField,
     MultiCodeBlock,
@@ -18,14 +13,9 @@ from notifications.mettermost.fields import (
 
 
 __all__ = [
-    'Mettermost',
+    'Mattermost',
     'Message',
     'mrkdwn',
-    'BaseBlock',
-    'HeaderBlock',
-    'SimpleTextBlockField',
-    'SimpleTextBlock',
-    'DividerBlock',
     'MultiCodeBlock',
     'TableBlock',
     'Attachment',

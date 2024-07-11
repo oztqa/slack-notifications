@@ -3,10 +3,10 @@ from typing import List
 import requests
 import logging
 
-from notifications.interfaces import Message, NotificationClient, Resource
+from notifications.common import Resource, NotificationClient
 from notifications.utils import _random_string
 
-from notifications.slack.fields import BaseBlock, Attachment
+from notifications.fields import BaseBlock, Attachment
 
 ACCESS_TOKEN = None
 ACCESS_TOKEN_ENV_NAME = 'SLACK_ACCESS_TOKEN'
@@ -19,14 +19,26 @@ class SlackError(requests.exceptions.RequestException):
     pass
 
 
-class SlackMessage(Message):
+class SlackMessage:
     def __init__(self, client, response,
                  text: str = None,
                  raise_exc=False,
                  attachments: List[Attachment] = None,
                  blocks: List[BaseBlock] = None):
         super().__init__(client, response, text, raise_exc, attachments, blocks)
+        self._client = client
+        self._response = response
+        self._raise_exc = raise_exc
+
+        self.text = text
+        self.attachments = attachments or []
+        self.blocks = blocks or []
+
         self.__lock_thread = False
+
+    @property
+    def response(self):
+        return self._response
 
     def _lock_thread(self):
         self.__lock_thread = True
@@ -57,10 +69,10 @@ class SlackMessage(Message):
             data['text'] = self.text
 
         if self.blocks:
-            data['blocks'] = [b.convert() for b in self.blocks]
+            data['blocks'] = [b.to_dict() for b in self.blocks]
 
         if self.attachments:
-            data['attachments'] = [a.convert() for a in self.attachments]
+            data['attachments'] = [a.to_dict() for a in self.attachments]
 
         return self._client.call_resource(
             Resource('chat.update', 'POST'),
@@ -111,9 +123,6 @@ class SlackMessage(Message):
 class Slack(NotificationClient):
     API_URL = 'https://slack.com/api'
 
-    DEFAULT_RECORDS_LIMIT = 100
-    DEFAULT_REQUEST_TIMEOUT = 180
-
     def __init__(self, token: str):
         super().__init__(self.API_URL, token=token)
 
@@ -153,10 +162,10 @@ class Slack(NotificationClient):
             data['icon_emoji'] = icon_emoji
 
         if blocks:
-            data['blocks'] = [b.convert() for b in blocks]
+            data['blocks'] = [b.to_dict() for b in blocks]
 
         if attachments:
-            data['attachments'] = [a.convert() for a in attachments]
+            data['attachments'] = [a.to_dict() for a in attachments]
 
         if thread_ts:
             data['thread_ts'] = thread_ts

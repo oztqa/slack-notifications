@@ -1,5 +1,5 @@
 from notifications.slack.client import Slack, SlackMessage as Message
-from notifications.slack.fields import (
+from notifications.fields import (
     BaseBlock,
     BaseBlockField,
     HeaderBlock,

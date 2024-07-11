@@ -1,14 +1,9 @@
-from notifications.mettermost.fields import mrkdwn
-from notifications.mettermost.fields.blocks import (
-    BaseBlock,
-    HeaderBlock,
-    SimpleTextBlockField,
-    SimpleTextBlock,
-    DividerBlock,
+from notifications.mattermost.fields import mrkdwn
+from notifications.mattermost.fields.blocks import (
     MultiCodeBlock,
     TableBlock
 )
-from notifications.mettermost.fields.attachments import (
+from notifications.mattermost.fields.attachments import (
     Attachment,
     AttachmentField,
     AttachmentActionField,
@@ -20,11 +15,6 @@ from notifications.mettermost.fields.attachments import (
 
 __all__ = [
     'mrkdwn',
-    'BaseBlock',
-    'HeaderBlock',
-    'SimpleTextBlockField',
-    'SimpleTextBlock',
-    'DividerBlock',
     'MultiCodeBlock',
     'TableBlock',
     'Attachment',

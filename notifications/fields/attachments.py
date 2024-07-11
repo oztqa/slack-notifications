@@ -1,10 +1,10 @@
 from typing import List
 
-from notifications.interfaces.fields import ConvertibleObject
+from notifications.common import DictConvertibleObject
 from notifications.constants import COLOR_MAP
 
 
-class AttachmentField(ConvertibleObject):
+class AttachmentField(DictConvertibleObject):
 
     def __init__(self, *, title: str = None, value: str = None, short: bool = False):
         super(AttachmentField, self).__init__()
@@ -13,7 +13,7 @@ class AttachmentField(ConvertibleObject):
         self.value = value
         self.short = short
 
-    def convert(self):
+    def to_dict(self):
         assert self.title is not None or self.value is not None, \
             'Title or value is required for attachment field'
 
@@ -28,7 +28,7 @@ class AttachmentField(ConvertibleObject):
         return data
 
 
-class Attachment(ConvertibleObject):
+class Attachment(DictConvertibleObject):
     Field = AttachmentField
 
     def __init__(self, *,
@@ -73,7 +73,7 @@ class Attachment(ConvertibleObject):
         self.mrkdwn = mrkdwn
         self.color = color
 
-    def convert(self):
+    def to_dict(self):
         data = {
             'mrkdwn_in': [],
         }
@@ -126,7 +126,7 @@ class Attachment(ConvertibleObject):
             data['ts'] = self.timestamp
 
         if self.fields:
-            data['fields'] = [f.convert() for f in self.fields]
+            data['fields'] = [f.to_dict() for f in self.fields]
             if self.mrkdwn:
                 data['mrkdwn_in'].append('fields')
 

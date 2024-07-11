@@ -1,9 +1,9 @@
 from typing import List, Union
 
-from notifications.interfaces.fields import ConvertibleObject
+from notifications.common import DictConvertibleObject
 
 
-class BaseBlock(ConvertibleObject):
+class BaseBlock(DictConvertibleObject):
     __type__ = None
 
     def __init__(self, *, mrkdwn: bool = True, block_id: str = None):
@@ -13,7 +13,7 @@ class BaseBlock(ConvertibleObject):
         self.block_id = block_id
         self.content_type = 'mrkdwn' if self.mrkdwn else 'plain_text'
 
-    def convert(self):
+    def to_dict(self):
         data = {
             'type': self.__type__,
         }
@@ -23,8 +23,13 @@ class BaseBlock(ConvertibleObject):
 
         return data
 
+    def accept(self, converter):
+        raise NotImplementedError(
+            'Object "{}" does not implemented "accept" method'.format(self.__class__.__name__),
+        )
 
-class BaseBlockField(ConvertibleObject):
+
+class BaseBlockField(DictConvertibleObject):
     __type__ = None
 
     def __init__(self, *, mrkdwn=True):
@@ -33,7 +38,7 @@ class BaseBlockField(ConvertibleObject):
         self.mrkdwn = mrkdwn
         self.content_type = 'mrkdwn' if self.mrkdwn else 'plain_text'
 
-    def convert(self):
+    def to_dict(self):
         if self.__type__:
             return {
                 'type': self.__type__,
@@ -51,8 +56,8 @@ class HeaderBlock(BaseBlock):
 
         self.text = text
 
-    def convert(self):
-        data = super().convert()
+    def to_dict(self):
+        data = super().to_dict()
 
         data['text'] = {
             'type': self.content_type,
@@ -60,6 +65,9 @@ class HeaderBlock(BaseBlock):
         }
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_header_block(self)
 
 
 class SimpleTextBlockField(BaseBlockField):
@@ -70,8 +78,8 @@ class SimpleTextBlockField(BaseBlockField):
         self.text = text
         self.emoji = emoji
 
-    def convert(self):
-        data = super(SimpleTextBlockField, self).convert()
+    def to_dict(self):
+        data = super(SimpleTextBlockField, self).to_dict()
 
         data['text'] = self.text
         data['type'] = self.content_type
@@ -80,6 +88,9 @@ class SimpleTextBlockField(BaseBlockField):
             data['emoji'] = self.emoji
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_simple_text_block_field(self)
 
 
 class SimpleTextBlock(BaseBlock):
@@ -93,8 +104,8 @@ class SimpleTextBlock(BaseBlock):
         self.text = text
         self.fields = fields
 
-    def convert(self):
-        data = super(SimpleTextBlock, self).convert()
+    def to_dict(self):
+        data = super(SimpleTextBlock, self).to_dict()
 
         data['text'] = {
             'type': self.content_type,
@@ -102,13 +113,19 @@ class SimpleTextBlock(BaseBlock):
         }
 
         if self.fields:
-            data['fields'] = [f.convert() for f in self.fields]
+            data['fields'] = [f.to_dict() for f in self.fields]
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_simple_text_block(self)
 
 
 class DividerBlock(BaseBlock):
     __type__ = 'divider'
+
+    def accept(self, converter):
+        return converter.convert_divider_block(self)
 
 
 class ImageBlock(BaseBlock):
@@ -122,8 +139,8 @@ class ImageBlock(BaseBlock):
         self.title = title
         self.alt_text = alt_text or image_url
 
-    def convert(self):
-        data = super(ImageBlock, self).convert()
+    def to_dict(self):
+        data = super(ImageBlock, self).to_dict()
 
         data['image_url'] = self.image_url
 
@@ -138,6 +155,9 @@ class ImageBlock(BaseBlock):
 
         return data
 
+    def accept(self, converter):
+        return converter.convert_image_block(self)
+
 
 class ContextBlockTextElement(BaseBlockField):
 
@@ -146,13 +166,16 @@ class ContextBlockTextElement(BaseBlockField):
 
         self.text = text
 
-    def convert(self):
-        data = super(ContextBlockTextElement, self).convert()
+    def to_dict(self):
+        data = super(ContextBlockTextElement, self).to_dict()
 
         data['text'] = self.text
         data['type'] = self.content_type
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_context_block_text_element(self)
 
 
 class ContextBlockImageElement(BaseBlockField):
@@ -164,8 +187,8 @@ class ContextBlockImageElement(BaseBlockField):
         self.image_url = image_url
         self.alt_text = alt_text
 
-    def convert(self):
-        data = super(ContextBlockImageElement, self).convert()
+    def to_dict(self):
+        data = super(ContextBlockImageElement, self).to_dict()
 
         data['image_url'] = self.image_url
 
@@ -173,6 +196,9 @@ class ContextBlockImageElement(BaseBlockField):
             data['alt_text'] = self.alt_text
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_context_block_image_element(self)
 
 
 class ContextBlock(BaseBlock):
@@ -186,12 +212,15 @@ class ContextBlock(BaseBlock):
 
         self.elements = elements
 
-    def convert(self):
-        data = super(ContextBlock, self).convert()
+    def to_dict(self):
+        data = super(ContextBlock, self).to_dict()
 
-        data['elements'] = [e.convert() for e in self.elements]
+        data['elements'] = [e.to_dict() for e in self.elements]
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_context_block(self)
 
 
 class ButtonBlock(BaseBlock):
@@ -205,8 +234,8 @@ class ButtonBlock(BaseBlock):
         self.value = value
         self.style = style
 
-    def convert(self):
-        data = super(ButtonBlock, self).convert()
+    def to_dict(self):
+        data = super(ButtonBlock, self).to_dict()
 
         data['action_id'] = self.action_id
         data['value'] = self.value
@@ -219,6 +248,9 @@ class ButtonBlock(BaseBlock):
 
         return data
 
+    def accept(self, converter):
+        return converter.convert_button_block(self)
+
 
 class ActionsBlock(BaseBlock):
     __type__ = 'actions'
@@ -228,9 +260,12 @@ class ActionsBlock(BaseBlock):
 
         self.elements = elements
 
-    def convert(self):
-        data = super(ActionsBlock, self).convert()
+    def to_dict(self):
+        data = super(ActionsBlock, self).to_dict()
 
-        data['elements'] = [e.convert() for e in self.elements]
+        data['elements'] = [e.to_dict() for e in self.elements]
 
         return data
+
+    def accept(self, converter):
+        return converter.convert_actions_block(self)

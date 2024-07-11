@@ -1,31 +1,8 @@
 from typing import List
 
 from notifications.constants import COLOR_MAP
-from notifications.interfaces.fields import ConvertibleObject
-
-
-class AttachmentField(ConvertibleObject):
-
-    def __init__(self, *, title: str = None, value: str = None, short: bool = False):
-        super(AttachmentField, self).__init__()
-
-        self.title = title
-        self.value = value
-        self.short = short
-
-    def convert(self):
-        assert self.title is not None or self.value is not None, \
-            'Title or value is required for attachment field'
-
-        data = {'short': self.short}
-
-        if self.title:
-            data['title'] = self.title
-
-        if self.value:
-            data['value'] = self.value
-
-        return data
+from notifications.common import DictConvertibleObject
+from notifications.fields.attachments import AttachmentField
 
 
 class AttachmentActionField:
@@ -38,7 +15,7 @@ class AttachmentActionField:
         self.integration = integration_payload
         self.style = style
 
-    def convert(self):
+    def to_dict(self):
         data = {
             'id': self.action_id,
             'type': self.__type__,
@@ -62,7 +39,7 @@ class AttachmentOptionField:
         self.text = text
         self.value = value
 
-    def convert(self):
+    def to_dict(self):
         data = {'text': self.text, 'value': self.value}
         return data
 
@@ -78,8 +55,8 @@ class AttachmentMenuField(AttachmentActionField):
         self.options = options
         self.data_source = data_source
 
-    def convert(self):
-        data = super(AttachmentMenuField, self).convert()
+    def to_dict(self):
+        data = super(AttachmentMenuField, self).to_dict()
 
         data['options'] = self.options
 
@@ -89,7 +66,7 @@ class AttachmentMenuField(AttachmentActionField):
         return data
 
 
-class Attachment(ConvertibleObject):
+class Attachment(DictConvertibleObject):
     Field = AttachmentField
 
     def __init__(self, *,
@@ -133,7 +110,7 @@ class Attachment(ConvertibleObject):
 
         self.color = color
 
-    def convert(self):
+    def to_dict(self):
         data = {}
 
         if self.color:
@@ -173,9 +150,9 @@ class Attachment(ConvertibleObject):
             data['footer_icon'] = self.footer_icon
 
         if self.fields:
-            data['fields'] = [f.convert() for f in self.fields]
+            data['fields'] = [f.to_dict() for f in self.fields]
 
         if self.actions:
-            data['actions'] = [f.convert() for f in self.actions]
+            data['actions'] = [f.to_dict() for f in self.actions]
 
         return data
