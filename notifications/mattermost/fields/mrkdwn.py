@@ -29,10 +29,6 @@ def link(url, text):
     return f'[{str(text)}]({url})'
 
 
-def image(image_url, description):
-    return f'![{description}]({image_url})'
-
-
 def user_mention(user_id):
     return f'@{user_id}'
 

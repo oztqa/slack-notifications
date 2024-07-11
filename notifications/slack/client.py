@@ -25,7 +25,6 @@ class SlackMessage:
                  raise_exc=False,
                  attachments: List[Attachment] = None,
                  blocks: List[BaseBlock] = None):
-        super().__init__(client, response, text, raise_exc, attachments, blocks)
         self._client = client
         self._response = response
         self._raise_exc = raise_exc
@@ -132,17 +131,17 @@ class Slack(NotificationClient):
         assert token is not None, 'Please export "{}" environment variable'.format(ACCESS_TOKEN_ENV_NAME)
         return cls(token)
 
-    def send_notification(self,
-                          channel, *,
-                          text: str = None,
-                          username: str = None,
-                          icon_url: str = None,
-                          icon_emoji: str = None,
-                          link_names: bool = True,
-                          raise_exc: bool = False,
-                          attachments: List = None,
-                          blocks: List = None,
-                          thread_ts: str = None) -> SlackMessage:
+    def send_notify(self,
+                    channel, *,
+                    text: str = None,
+                    username: str = None,
+                    icon_url: str = None,
+                    icon_emoji: str = None,
+                    link_names: bool = True,
+                    raise_exc: bool = False,
+                    attachments: List[Attachment] = None,
+                    blocks: List[BaseBlock] = None,
+                    thread_ts: str = None) -> SlackMessage:
         data = {
             'channel': channel,
             'link_names': link_names,
@@ -211,6 +210,30 @@ class Slack(NotificationClient):
             },
         )
 
+    def resource_iterator(self,
+                          resource: Resource, from_key: str, *,
+                          cursor: str = None,
+                          raise_exc: bool = False,
+                          limit: int = None):
+        params = {'limit': limit}
+
+        if cursor:
+            params['cursor'] = cursor
+
+        response = self.call_resource(resource, params=params, raise_exc=raise_exc)
+        data = response.json()
+
+        for item in data[from_key]:
+            yield item
+
+        cursor = data.get('response_metadata', {}).get('next_cursor')
+
+        if cursor:
+            yield from self.resource_iterator(
+                resource, from_key,
+                limit=limit or self.DEFAULT_RECORDS_LIMIT, cursor=cursor, raise_exc=raise_exc,
+            )
+
 
 def call_resource(*args, **kwargs):
     return Slack.from_env().call_resource(*args, **kwargs)
@@ -221,4 +244,4 @@ def resource_iterator(*args, **kwargs):
 
 
 def send_notify(*args, **kwargs):
-    return Slack.from_env().send_notification(*args, **kwargs)
+    return Slack.from_env().send_notify(*args, **kwargs)

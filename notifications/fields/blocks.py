@@ -23,11 +23,6 @@ class BaseBlock(DictConvertibleObject):
 
         return data
 
-    def accept(self, converter):
-        raise NotImplementedError(
-            'Object "{}" does not implemented "accept" method'.format(self.__class__.__name__),
-        )
-
 
 class BaseBlockField(DictConvertibleObject):
     __type__ = None
@@ -66,9 +61,6 @@ class HeaderBlock(BaseBlock):
 
         return data
 
-    def accept(self, converter):
-        return converter.convert_header_block(self)
-
 
 class SimpleTextBlockField(BaseBlockField):
 
@@ -88,9 +80,6 @@ class SimpleTextBlockField(BaseBlockField):
             data['emoji'] = self.emoji
 
         return data
-
-    def accept(self, converter):
-        return converter.convert_simple_text_block_field(self)
 
 
 class SimpleTextBlock(BaseBlock):
@@ -117,15 +106,9 @@ class SimpleTextBlock(BaseBlock):
 
         return data
 
-    def accept(self, converter):
-        return converter.convert_simple_text_block(self)
-
 
 class DividerBlock(BaseBlock):
     __type__ = 'divider'
-
-    def accept(self, converter):
-        return converter.convert_divider_block(self)
 
 
 class ImageBlock(BaseBlock):
@@ -155,9 +138,6 @@ class ImageBlock(BaseBlock):
 
         return data
 
-    def accept(self, converter):
-        return converter.convert_image_block(self)
-
 
 class ContextBlockTextElement(BaseBlockField):
 
@@ -173,9 +153,6 @@ class ContextBlockTextElement(BaseBlockField):
         data['type'] = self.content_type
 
         return data
-
-    def accept(self, converter):
-        return converter.convert_context_block_text_element(self)
 
 
 class ContextBlockImageElement(BaseBlockField):
@@ -197,9 +174,6 @@ class ContextBlockImageElement(BaseBlockField):
 
         return data
 
-    def accept(self, converter):
-        return converter.convert_context_block_image_element(self)
-
 
 class ContextBlock(BaseBlock):
     __type__ = 'context'
@@ -218,9 +192,6 @@ class ContextBlock(BaseBlock):
         data['elements'] = [e.to_dict() for e in self.elements]
 
         return data
-
-    def accept(self, converter):
-        return converter.convert_context_block(self)
 
 
 class ButtonBlock(BaseBlock):
@@ -248,9 +219,6 @@ class ButtonBlock(BaseBlock):
 
         return data
 
-    def accept(self, converter):
-        return converter.convert_button_block(self)
-
 
 class ActionsBlock(BaseBlock):
     __type__ = 'actions'
@@ -266,6 +234,3 @@ class ActionsBlock(BaseBlock):
         data['elements'] = [e.to_dict() for e in self.elements]
 
         return data
-
-    def accept(self, converter):
-        return converter.convert_actions_block(self)

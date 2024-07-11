@@ -43,9 +43,9 @@ class MattermostMessage:
     def send_to_thread(self, **kwargs):
         json = self._response.json()
         message_id = json['id']
-        kwargs.update(root_id=message_id)
+        kwargs.update(thread_ts=message_id)
 
-        message = self._client.send_notification(json['channel_id'], **kwargs)
+        message = self._client.send_notify(json['channel_id'], **kwargs)
 
         return message
 
@@ -133,47 +133,37 @@ class Mattermost(NotificationClient):
 
         return cls(base_url, token=token, team_id=team_id)
 
-    def _convert(self, blocks: List[BaseBlock]):
-        converter = MattermostConverter()
-        for block in blocks:
-            if not isinstance(block, BaseBlock):
-                converter.result += f'\n{block}\n'
-                continue
-
-            block.accept(converter)
-        return converter.result
-
-    def send_notification(self,
-                          channel: str, *,
-                          text=None,
-                          blocks: List[BaseBlock] = None,
-                          attachments: List[Attachment] = None,
-                          file_ids: List[str] = None,
-                          root_id: str = None,
-                          priority: str = None,
-                          raise_exc: bool = False,
-                          requested_ack: bool = False):
+    def send_notify(self,
+                    channel, *,
+                    text: str = None,
+                    username: str = None,
+                    icon_url: str = None,
+                    icon_emoji: str = None,
+                    link_names: bool = True,
+                    raise_exc: bool = False,
+                    attachments: List[Attachment] = None,
+                    blocks: List[BaseBlock] = None,
+                    thread_ts: str = None):
+        if not thread_ts:
+            channel = self.channel_id_by_name(channel)
 
         data = {
-            'channel_id': self.channel_id_by_name(channel),
+            'channel_id': channel,
             'message': text or '',
             'props': {},
             'metadata': {}
         }
-        if blocks:
-            data['message'] += self._convert(blocks)
+        converter = MattermostConverter()
+        converter.convert(blocks=blocks)
 
-        if root_id:
-            data['root_id'] = root_id
+        if blocks:
+            data['message'] += converter.message
+
+        if thread_ts:
+            data['root_id'] = thread_ts
 
         if attachments:
             data['props']['attachments'] = [a.to_dict() for a in attachments]
-
-        if file_ids:
-            data['file_ids'] = file_ids
-
-        if priority or requested_ack:
-            data['metadata']['priority'] = {'priority': priority or 'empty', 'requested_ack': requested_ack}
 
         response = self.call_resource(
             Resource('posts', 'POST'), json=data,
@@ -182,5 +172,12 @@ class Mattermost(NotificationClient):
             self, response, text=text, raise_exc=raise_exc,  blocks=blocks, attachments=attachments
         )
 
-    def upload_file(self, *args, **kwargs):
+    def upload_file(self,
+                    channel, file, *,
+                    title: str = None,
+                    content: str = None,
+                    filename: str = None,
+                    thread_ts: str = None,
+                    filetype: str = 'text',
+                    raise_exc: bool = False):
         pass
