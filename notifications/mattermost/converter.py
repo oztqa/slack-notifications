@@ -97,8 +97,11 @@ class MattermostConverter:
             'id': block.action_id,
             'type': block.__type__,
             'name': block.text,
-            'integration': block.value or {},
-
+            'integration': {
+                'context': {
+                    'value': block.value
+                }
+            }
         }
         if block.style is not None:
             data['style'] = block.style
