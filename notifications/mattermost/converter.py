@@ -1,6 +1,6 @@
 from typing import List
 
-from notifications.fields.blocks import (
+from notifications.fields import (
     BaseBlock,
     HeaderBlock,
     SimpleTextBlock,
@@ -11,14 +11,18 @@ from notifications.fields.blocks import (
     ContextBlockTextElement,
     ContextBlockImageElement,
     ActionsBlock,
-    ButtonBlock
+    ButtonBlock,
+    Attachment
 )
 
 
 class MattermostConverter:
-    def __init__(self, *, header_level: int = 4):
+    def __init__(self, *, header_level: int = 4, blocks: List[BaseBlock] = None):
         self.message = ''
         self._level = header_level
+        self._blocks = blocks or []
+        self.attachments_result = []
+
         self.block_handlers: dict[type[BaseBlock], callable] = {
             HeaderBlock: self.convert_header_block,
             SimpleTextBlock: self.convert_simple_text_block,
@@ -30,10 +34,22 @@ class MattermostConverter:
     def convert(self, blocks: List[BaseBlock]):
         if not blocks:
             return
+
+        attachment = Attachment()
+        attachment_data = attachment.to_dict()
+        attachment_data['actions'] = []
+
         for block in blocks:
             block_handler = self.block_handlers.get(type(block))
             if block_handler:
                 block_handler(block)
+
+            if isinstance(block, ActionsBlock):
+                attachment_data['actions'] += self.convert_actions_block(block)
+
+        if 'actions' in attachment_data:
+
+            self.attachments_result.append(attachment_data)
 
     def fields_to_table(self, fields: List[SimpleTextBlockField]):
         header = '| |'
@@ -68,3 +84,23 @@ class MattermostConverter:
             if isinstance(element, ContextBlockImageElement):
                 self.message += f' ![{element.alt_text}]({element.image_url} =30) '
         self.message += '\n'
+
+    def convert_actions_block(self, block: ActionsBlock):
+        data = []
+        for element in block.elements:
+            if isinstance(element, ButtonBlock):
+                data.append(self.convert_button_block(element))
+        return data
+
+    def convert_button_block(self, block: ButtonBlock):
+        data = {
+            'id': block.action_id,
+            'type': block.__type__,
+            'name': block.text,
+            'integration': block.value or {},
+
+        }
+        if block.style is not None:
+            data['style'] = block.style
+
+        return data

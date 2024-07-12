@@ -162,8 +162,11 @@ class Mattermost(NotificationClient):
         if thread_ts:
             data['root_id'] = thread_ts
 
+        data['props']['attachments'] = []
+        if converter.attachments_result:
+            data['props']['attachments'].extend(converter.attachments_result)
         if attachments:
-            data['props']['attachments'] = [a.to_dict() for a in attachments]
+            data['props']['attachments'].extend([a.to_dict() for a in attachments])
 
         response = self.call_resource(
             Resource('posts', 'POST'), json=data,
