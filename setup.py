@@ -1,6 +1,6 @@
 from os import path
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 BASE_PATH = path.abspath(path.dirname(__file__))
 
@@ -9,6 +9,7 @@ with open(path.join(BASE_PATH, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='slack-notifications',
+    packages=find_packages(include=('notifications', 'notifications.*')),
     version_format='{tag}',
     setup_requires=['setuptools-git-version'],
     description='Send notifications to slack channel with supporting attachments and fields',
