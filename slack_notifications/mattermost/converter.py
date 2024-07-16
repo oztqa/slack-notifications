@@ -1,6 +1,6 @@
 from typing import List
 
-from notifications.fields import (
+from slack_notifications.fields import (
     BaseBlock,
     HeaderBlock,
     SimpleTextBlock,

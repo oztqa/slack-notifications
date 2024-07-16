@@ -3,10 +3,9 @@ from typing import List
 import requests
 import logging
 
-from notifications.common import Resource, NotificationClient
-from notifications.utils import _random_string
-
-from notifications.fields import BaseBlock, Attachment
+from slack_notifications.common import Resource, NotificationClient
+from slack_notifications.utils import _random_string
+from slack_notifications.fields import BaseBlock, Attachment
 
 ACCESS_TOKEN = None
 ACCESS_TOKEN_ENV_NAME = 'SLACK_ACCESS_TOKEN'

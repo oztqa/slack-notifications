@@ -3,11 +3,11 @@ from typing import List
 import logging
 import requests
 
-from notifications.utils import _random_string
-from notifications.common import NotificationClient, Resource
-from notifications.fields.blocks import BaseBlock
-from notifications.fields.attachments import Attachment
-from notifications.mattermost.converter import MattermostConverter
+from slack_notifications.utils import _random_string
+from slack_notifications.common import NotificationClient, Resource
+from slack_notifications.fields.blocks import BaseBlock
+from slack_notifications.fields.attachments import Attachment
+from slack_notifications.mattermost.converter import MattermostConverter
 
 ACCESS_TOKEN = None
 ACCESS_TOKEN_ENV_NAME = 'SLACK_ACCESS_TOKEN'

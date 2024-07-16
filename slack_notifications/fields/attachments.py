@@ -1,7 +1,7 @@
 from typing import List
 
-from notifications.common import DictConvertibleObject
-from notifications.constants import COLOR_MAP
+from slack_notifications.common import DictConvertibleObject
+from slack_notifications.constants import COLOR_MAP
 
 
 class AttachmentField(DictConvertibleObject):

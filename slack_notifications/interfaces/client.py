@@ -1,7 +1,7 @@
 from typing import Protocol, List
 
-from notifications.fields.blocks import BaseBlock
-from notifications.fields.attachments import Attachment
+from slack_notifications.fields.blocks import BaseBlock
+from slack_notifications.fields.attachments import Attachment
 
 
 class InterfaceMessage(Protocol):

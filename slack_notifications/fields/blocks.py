@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from notifications.common import DictConvertibleObject
+from slack_notifications.common import DictConvertibleObject
 
 
 class BaseBlock(DictConvertibleObject):

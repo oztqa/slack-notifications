@@ -1,4 +1,4 @@
-from notifications.fields.blocks import (
+from slack_notifications.fields.blocks import (
     BaseBlock,
     BaseBlockField,
     HeaderBlock,
@@ -12,7 +12,7 @@ from notifications.fields.blocks import (
     ActionsBlock,
     ButtonBlock
 )
-from notifications.fields.attachments import (
+from slack_notifications.fields.attachments import (
     Attachment,
     AttachmentField
 )

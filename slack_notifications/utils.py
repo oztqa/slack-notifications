@@ -1,7 +1,7 @@
 import string
 import random
 
-from notifications.constants import COLOR_MAP
+from slack_notifications.constants import COLOR_MAP
 
 
 def _random_string(length):

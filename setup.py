@@ -9,7 +9,7 @@ with open(path.join(BASE_PATH, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='slack-notifications',
-    packages=find_packages(include=('notifications', 'notifications.*')),
+    packages=find_packages(include=('slack_notifications', 'slack_notifications.*')),
     version_format='{tag}',
     setup_requires=['setuptools-git-version'],
     description='Send notifications to slack channel with supporting attachments and fields',
