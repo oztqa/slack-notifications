@@ -17,6 +17,10 @@ def code_block(text):
     return f'`{str(text)}`'
 
 
+def multi_line_code_block(text, *, lang=''):
+    return f'```{lang}\n{str(text)}\n```'
+
+
 def block_quotes(text):
     return f'>{str(text)}'
 

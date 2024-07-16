@@ -35,7 +35,7 @@ class MattermostConverter:
         if not blocks:
             return
 
-        attachment = Attachment()
+        attachment = Attachment(color='gray')
         attachment_data = attachment.to_dict()
         attachment_data['actions'] = []
 
