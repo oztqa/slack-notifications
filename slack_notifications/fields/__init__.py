@@ -16,6 +16,7 @@ from slack_notifications.fields.attachments import (
     Attachment,
     AttachmentField
 )
+from slack_notifications.fields import mrkdwn
 
 
 __all__ = [
@@ -33,4 +34,5 @@ __all__ = [
     'ButtonBlock',
     'Attachment',
     'AttachmentField',
+    'mrkdwn',
 ]

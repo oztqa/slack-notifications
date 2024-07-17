@@ -197,7 +197,7 @@ class ContextBlock(BaseBlock):
 class ButtonBlock(BaseBlock):
     __type__ = 'button'
 
-    def __init__(self, text: str, action_id: str, value: str, style: str = None,  **kwargs):
+    def __init__(self, text: str, *, action_id: str, value: str, style: str = None,  **kwargs):
         super(ButtonBlock, self).__init__(**kwargs)
 
         self.text = text
@@ -223,7 +223,7 @@ class ButtonBlock(BaseBlock):
 class ActionsBlock(BaseBlock):
     __type__ = 'actions'
 
-    def __init__(self, elements: List[ButtonBlock], **kwargs):
+    def __init__(self, *, elements: List[ButtonBlock], **kwargs):
         super(ActionsBlock, self).__init__(**kwargs)
 
         self.elements = elements

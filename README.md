@@ -12,7 +12,7 @@ pip install slack-notifications
 ```python
 import os
 
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
 
 
 slack.ACCESS_TOKEN = 'xxx'
@@ -26,7 +26,7 @@ or
 ```python
 import os
 
-from slack_notifications import Slack
+from slack_notifications.slack import Slack
 
 slack = Slack('<token>')
 slack.send_notify('channel-name', username='Bot', text='@channel This is test message')
@@ -37,7 +37,8 @@ slack.send_notify('channel-name', username='Bot', text='@channel This is test me
 ```python
 import os
 
-from slack_notifications import Slack, Attachment
+from slack_notifications.slack import Slack
+from slack_notifications.fields import Attachment
 
 slack = Slack('<token>')
 message = slack.send_notify('channel-name', username='Bot', text='@channel This is test message')
@@ -67,13 +68,14 @@ message.update()
 ```python
 import os
 
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
+import slack_notifications.fields as fields
 
 
 slack.ACCESS_TOKEN = 'xxx'
 
 
-attachment = slack.Attachment(
+attachment = fields.Attachment(
     title='Attachment title',
     pretext='Attachment pretext',
     text='Attachment text',
@@ -90,19 +92,19 @@ See program API
 ## Attachment fields
 
 ```python
-import slack_notifications as slack
-
+import slack_notifications.slack.client as slack
+import slack_notifications.fields as fields
 
 slack.ACCESS_TOKEN = 'xxx'
 
 
-attachment = slack.Attachment(
+attachment = fields.Attachment(
     title='Attachment title',
     pretext='Attachment pretext',
     text='Attachment text',
     footer='Attachment footer',
     fields=[
-        slack.Attachment.Field(
+        fields.Attachment.Field(
             title='Field title',
             value='Field value',
         ),
@@ -117,19 +119,20 @@ slack.send_notify('channel-name', username='Bot', text='@channel This is test me
 ## Simple Text Block
 
 ```python
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
+import slack_notifications.fields as fields
 
 
 slack.ACCESS_TOKEN = 'xxx'
 
 
-block = slack.SimpleTextBlock(
+block = fields.SimpleTextBlock(
     'Text example',
     fields=[
-        slack.SimpleTextBlock.Field(
+        fields.SimpleTextBlock.Field(
             'Text field',
         ),
-        slack.SimpleTextBlock.Field(
+        fields.SimpleTextBlock.Field(
             'Text field',
             emoji=True,
         ),
@@ -139,22 +142,155 @@ block = slack.SimpleTextBlock(
 slack.send_notify('channel-name', username='Bot', text='@channel This is test message', blocks=[block])
 ```
 
+## Action Block
+
+```python
+import slack_notifications.slack.client as slack
+import slack_notifications.fields as fields
+
+
+slack.ACCESS_TOKEN = 'xxx'
+
+
+block = fields.ActionsBlock(
+    elements=[
+        fields.ButtonBlock(
+            'Yes', 
+            action_id='action1',
+            value='some_data1',
+            style='primary'
+        ),
+        fields.ButtonBlock(
+            'No', 
+            action_id='action2',
+            value='some_data2',
+            style='danger'
+        ),
+    ],
+)
+
+slack.send_notify('channel-name', username='Bot', text='@channel This is test message', blocks=[block])
+```
+
+
+## Use mrkdwn module
+
+```python
+import slack_notifications.fields as fields
+
+
+block = fields.SimpleTextBlock(
+    'Text example',
+    fields=[
+        fields.SimpleTextBlock.Field(
+            fields.mrkdwn.bold('Text field'),
+        ),
+        fields.SimpleTextBlock.Field(
+            fields.mrkdwn.italic('Text field'),
+            emoji=True,
+        ),
+    ],
+)
+```
+
+## Mattermost interface
+
+### Simple usage
+
+```python
+import os
+
+import slack_notifications.mattermost.client as mattermost
+
+
+mattermost.ACCESS_TOKEN = 'xxx'
+mattermost.BASE_URL_ENV_NAME = 'http://your-mattermost-url.com/api/v4'
+mattermost.TEAM_ID_ENV_NAME = 'xxx'
+
+
+mattermost.send_notify('channel-name', username='Bot', text='@channel This is test message')
+```
+
+or
+
+```python
+import os
+
+from slack_notifications.mattermost import Mattermost
+
+mattermost = Mattermost('http://your-mattermost-url.com/api/v4',
+                   token='<token>',
+                   team_id='xxx')
+mattermost.send_notify('channel-name', username='Bot', text='@channel This is test message')
+```
+
+
+### Use fields for Mattermost
+
+```python
+import slack_notifications.mattermost.client as mattermost
+import slack_notifications.fields as fields
+
+
+mattermost.ACCESS_TOKEN = 'xxx'
+mattermost.BASE_URL_ENV_NAME = 'http://your-mattermost-url.com/api/v4'
+mattermost.TEAM_ID_ENV_NAME = 'xxx'
+
+
+
+block = fields.SimpleTextBlock(
+    'Text example',
+    fields=[
+        fields.SimpleTextBlock.Field(
+            'Text field',
+        ),
+        fields.SimpleTextBlock.Field(
+            'Text field',
+            emoji=True,
+        ),
+    ],
+)
+
+mattermost.send_notify('channel-name', username='Bot', text='@channel This is test message', blocks=[block])
+```
+
+
+### Use mrkdwn module for Mattermost
+
+```python
+import slack_notifications.fields as fields
+from slack_notifications.mattermost import mrkdwn
+
+
+block = fields.SimpleTextBlock(
+    'Text example',
+    fields=[
+        fields.SimpleTextBlock.Field(
+            mrkdwn.bold('Text field'),
+        ),
+        fields.SimpleTextBlock.Field(
+            mrkdwn.italic('Text field'),
+            emoji=True,
+        ),
+    ],
+)
+```
 See program API
 
 ## Init color
 
 ```python
-import slack_notifications as slack
+import slack_notifications.utils as utils
 
 
-slack.init_color('green', '#008000')
+utils.init_color('green', '#008000')
 ```
 
 
 ## Call slack resource
 
 ```python
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
 
 
 slack.ACCESS_TOKEN = 'xxx'
@@ -167,7 +303,7 @@ response = slack.call_resource(slack.Resource('users.info', 'GET'), params={'use
 ## Resource iterator
 
 ```python
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
 
 
 slack.ACCESS_TOKEN = 'xxx'
@@ -181,7 +317,7 @@ for user in slack.resource_iterator(slack.Resource('users.list', 'GET'), 'member
 ## Raise exception if error was given
 
 ```python
-import slack_notifications as slack
+import slack_notifications.slack.client as slack
 
 
 slack.ACCESS_TOKEN = 'xxx'
@@ -300,8 +436,18 @@ slack.send_notify('channel-name', username='Bot', text='@channel This is test me
 * text: str
 * mrkdwn: bool = True
 
-
 ### ContextBlock.ImageElement
 
 * image_url: str
 * alt_text: str = None
+
+
+## ActionsBlock
+* elements: List[ButtonBlock]
+
+### ButtonBlock
+* text: str
+* action_id: str
+* value: str
+* style: str = None
+

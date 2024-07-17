@@ -10,11 +10,11 @@ from slack_notifications.fields.attachments import Attachment
 from slack_notifications.mattermost.converter import MattermostConverter
 
 ACCESS_TOKEN = None
-ACCESS_TOKEN_ENV_NAME = 'SLACK_ACCESS_TOKEN'
+ACCESS_TOKEN_ENV_NAME = 'MATTERMOST_ACCESS_TOKEN'
 BASE_URL = None
 BASE_URL_ENV_NAME = 'MATTERMOST_URL'
 TEAM_ID = None
-TEAM_ID_ENV_NAME = 'SLACK_ACCESS_TOKEN'
+TEAM_ID_ENV_NAME = 'MATTERMOST_TEAM_ID_TOKEN'
 
 logger = logging.getLogger(__name__)
 
@@ -244,3 +244,11 @@ class Mattermost(NotificationClient):
         return MattermostMessage(
             self, response, text='', raise_exc=raise_exc, blocks=[], attachments=[]
         )
+
+
+def call_resource(*args, **kwargs):
+    return Mattermost.from_env().call_resource(*args, **kwargs)
+
+
+def send_notify(*args, **kwargs):
+    return Mattermost.from_env().send_notify(*args, **kwargs)
