@@ -28,6 +28,7 @@ import os
 
 from slack_notifications import Slack
 
+
 slack = Slack('<token>')
 slack.send_notify('channel-name', username='Bot', text='@channel This is test message')
 ```
@@ -38,6 +39,7 @@ slack.send_notify('channel-name', username='Bot', text='@channel This is test me
 import os
 
 from slack_notifications import Slack, Attachment
+
 
 slack = Slack('<token>')
 message = slack.send_notify('channel-name', username='Bot', text='@channel This is test message')
@@ -70,7 +72,6 @@ import os
 import slack_notifications as slack
 
 
-
 slack.ACCESS_TOKEN = 'xxx'
 
 
@@ -92,6 +93,7 @@ See program API
 
 ```python
 import slack_notifications as slack
+
 
 slack.ACCESS_TOKEN = 'xxx'
 
@@ -203,7 +205,6 @@ mattermost.ACCESS_TOKEN = 'xxx'
 mattermost.BASE_URL_ENV_NAME = 'http://your-mattermost-url.com/api/v4'
 mattermost.TEAM_ID_ENV_NAME = 'xxx'
 
-
 mattermost.send_notify('channel-name', username='Bot', text='@channel This is test message')
 ```
 
@@ -213,6 +214,7 @@ or
 import os
 
 from slack_notifications.mattermost import Mattermost
+
 
 mattermost = Mattermost('http://your-mattermost-url.com/api/v4',
                    token='<token>',
@@ -445,4 +447,3 @@ slack.send_notify('channel-name', username='Bot', text='@channel This is test me
 * action_id: str
 * value: str
 * style: str = None
-
