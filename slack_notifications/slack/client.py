@@ -1,7 +1,8 @@
 import os
 from typing import List
-import requests
 import logging
+
+import requests
 
 from slack_notifications.common import Resource, NotificationClient
 from slack_notifications.utils import _random_string

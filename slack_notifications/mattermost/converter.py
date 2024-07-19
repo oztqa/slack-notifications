@@ -58,7 +58,7 @@ class MattermostConverter:
         table_rows = []
         for i in range(0, len(fields), 2):
             row = fields[i:i + 2]
-            table_rows.append('|'+'|'.join(map(lambda v: str(v.text), row))+'|')
+            table_rows.append('|' + '|'.join(map(lambda v: str(v.text), row)) + '|')
 
         return '\n'.join([header, separator] + table_rows)
 

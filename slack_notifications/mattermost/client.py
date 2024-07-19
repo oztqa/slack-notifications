@@ -1,6 +1,7 @@
 import os
 from typing import List
 import logging
+
 import requests
 
 from slack_notifications.utils import _random_string
@@ -187,7 +188,7 @@ class Mattermost(NotificationClient):
             Resource('posts', 'POST'), json=data,
         )
         return MattermostMessage(
-            self, response, text=text, raise_exc=raise_exc,  blocks=blocks, attachments=attachments
+            self, response, text=text, raise_exc=raise_exc, blocks=blocks, attachments=attachments
         )
 
     def upload_file(self,

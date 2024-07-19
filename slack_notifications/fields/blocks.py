@@ -197,7 +197,7 @@ class ContextBlock(BaseBlock):
 class ButtonBlock(BaseBlock):
     __type__ = 'button'
 
-    def __init__(self, text: str, *, action_id: str, value: str, style: str = None,  **kwargs):
+    def __init__(self, text: str, *, action_id: str, value: str, style: str = None, **kwargs):
         super(ButtonBlock, self).__init__(**kwargs)
 
         self.text = text
