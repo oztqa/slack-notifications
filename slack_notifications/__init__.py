@@ -1,6 +1,6 @@
-from constants import COLOR_MAP
-from utils import init_color
-from common import Resource
+from slack_notifications.constants import COLOR_MAP
+from slack_notifications.utils import init_color
+from slack_notifications.common import Resource
 from slack_notifications.slack import (
     Slack,
     Message,
