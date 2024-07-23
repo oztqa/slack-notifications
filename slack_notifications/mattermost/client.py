@@ -117,10 +117,7 @@ class MattermostMessage:
 
 class Mattermost(NotificationClient):
 
-    def __init__(self, base_url, *, token, team_id=None, api_endpoint=None):
-        if not api_endpoint:
-            api_endpoint = 'api/v4'
-
+    def __init__(self, base_url, *, token, team_id=None, api_endpoint='api/v4'):
         super(Mattermost, self).__init__('{}/{}'.format(base_url, api_endpoint), token=token)
         self._team_id = team_id
 
